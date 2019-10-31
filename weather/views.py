@@ -40,3 +40,21 @@ def forecast(request):
             }
             filtered_results += [data]
     return HttpResponse(json.dumps(filtered_results))
+
+
+def weather_in_capitals(request):
+    url = config.API['base_url'] + '/group?id={}&units=metric&units=metric&appid=' + config.API['key']
+    city_ids = config.API['captial_ids']
+    results = requests.get(url.format(city_ids)).json()
+
+    filtered_results = []
+    for result in results['list']:
+        weather = {
+            'city' : result['name'],
+            'temperature' : result['main']['temp'],
+            'description' : result['weather'][0]['main'],
+            'icon' : 'http://openweathermap.org/img/w/{}.png'.format((result['weather'][0]['icon']))
+        }
+
+        filtered_results += [weather]
+    return HttpResponse(json.dumps(filtered_results))
