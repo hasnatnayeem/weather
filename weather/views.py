@@ -5,7 +5,20 @@ import json
 from . import config
 
 
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+
 def current_weather(request):
+    print(get_client_ip(request))
+
     url = config.API['base_url'] + '/weather?q={}&units=metric&appid=' + config.API['key']
     city = request.ipinfo.city
     city_weather = requests.get(url.format(city)).json() 
@@ -13,7 +26,7 @@ def current_weather(request):
     weather = {
         'city' : city,
         'temperature' : city_weather['main']['temp'],
-        'description' : city_weather['weather'][0]['main'],
+        'description' : city_weather['weather'][0]['description'],
         'icon' : 'http://openweathermap.org/img/w/{}.png'.format((city_weather['weather'][0]['icon']))
     }
     return HttpResponse(json.dumps(weather))
@@ -35,7 +48,7 @@ def forecast(request):
                 'date': date,
                 'time': time,
                 'temperature': weather['main']['temp'],
-                'description': weather['weather'][0]['main'],
+                'description': weather['weather'][0]['description'],
                 'icon' : 'http://openweathermap.org/img/w/{}.png'.format((weather['weather'][0]['icon']))
             }
             filtered_results += [data]
@@ -52,7 +65,7 @@ def weather_in_capitals(request):
         weather = {
             'city' : result['name'],
             'temperature' : result['main']['temp'],
-            'description' : result['weather'][0]['main'],
+            'description' : result['weather'][0]['description'],
             'icon' : 'http://openweathermap.org/img/w/{}.png'.format((result['weather'][0]['icon']))
         }
 
