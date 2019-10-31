@@ -4,3 +4,5 @@ db.sqlite3
 fincite/__pycache__/
 weather/config.py
 weather/__pycache__/
+weather/migrations/__pycache__/
+fincite/settings.py
