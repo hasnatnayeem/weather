@@ -17,3 +17,26 @@ def current_weather(request):
         'icon' : 'http://openweathermap.org/img/w/{}.png'.format((city_weather['weather'][0]['icon']))
     }
     return HttpResponse(json.dumps(weather))
+
+
+def forecast(request):
+    url = config.API['base_url'] + '/forecast?q={}&cnt=50&units=metric&appid=' + config.API['key']
+    city = request.ipinfo.city
+    results = requests.get(url.format(city)).json() 
+
+    midday = '12:00:00'
+    filtered_results = []
+    for weather in results['list']:
+        date, time = weather['dt_txt'].split()
+        if time == midday:
+            data = {
+                'city': results['city']['name'],
+                'city_id': results['city']['id'],
+                'date': date,
+                'time': time,
+                'temperature': weather['main']['temp'],
+                'description': weather['weather'][0]['main'],
+                'icon' : 'http://openweathermap.org/img/w/{}.png'.format((weather['weather'][0]['icon']))
+            }
+            filtered_results += [data]
+    return HttpResponse(json.dumps(filtered_results))
