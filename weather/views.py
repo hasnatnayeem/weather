@@ -6,7 +6,14 @@ from . import config
 
 
 def current_weather(request):
-    url = 'http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid=de3eb0b64c75657b96f68709f813d718'
-    city = request.ipinfo.city
-    
-    return HttpResponse(json.dumps(request.ipinfo))
+    url = config.API['base_url'] + '/weather?q={}&units=metric&appid=' + config.API['key']
+    city = "Dhaka"
+    city_weather = requests.get(url.format(city)).json() 
+
+    weather = {
+        'city' : city,
+        'temperature' : city_weather['main']['temp'],
+        'description' : city_weather['weather'][0]['main'],
+        'icon' : 'http://openweathermap.org/img/w/{}.png'.format((city_weather['weather'][0]['icon']))
+    }
+    return HttpResponse(json.dumps(weather))
