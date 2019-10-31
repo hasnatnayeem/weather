@@ -7,7 +7,7 @@ from . import config
 
 def current_weather(request):
     url = config.API['base_url'] + '/weather?q={}&units=metric&appid=' + config.API['key']
-    city = "Dhaka"
+    city = request.ipinfo.city
     city_weather = requests.get(url.format(city)).json() 
 
     weather = {
